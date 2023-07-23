@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Grid with jQuery AJAX</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .grid-container{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .grid-item {
+      flex: 0 0 48%;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+    img {
+      width: 100%;
+      height: 411px;
+      object-fit: cover;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <!-- Grid to display images -->
+  <div class="grid-container" id="imageGrid">
+  </div>
+
+  <script>
+    // const apiUrl = 'http://dashboard.familyindustriesapps.com/api/JSTask';
+    const apiUrl = 'https://dummyjson.com/products';
+
+
+    // Function to create and display the grid of images
+    function createImageGrid(imagesData) {
+      const imageGrid = $('#imageGrid');
+
+      $.each(imagesData.products, (index, imageData) => {
+        const gridItem = $('<div class="grid-item"></div>');
+
+        const thumbnailImage = $('<img>');
+        thumbnailImage.attr('src', imageData.thumbnail);
+        gridItem.append(thumbnailImage);
+
+        // Function to load full-size image with animation
+        function loadFullSizeImage() {
+          const fullSizeImage = $('<img>');
+          fullSizeImage.on('load', () => {
+            fullSizeImage.css('opacity', 0);
+            gridItem.append(fullSizeImage);
+
+            // Animation to fade in the full-size image
+            let opacity = 0;
+            const animationInterval = setInterval(() => {
+              opacity += 0.05;
+              fullSizeImage.css('opacity', opacity);
+              if (opacity >= 1) clearInterval(animationInterval);
+            }, 50);
+          });
+          fullSizeImage.attr('src', imageData.images[0]);
+        }
+
+        // Add click event listener to load full-size image when clicked
+        gridItem.on('click', loadFullSizeImage);
+
+        imageGrid.append(gridItem);
+      });
+    }
+
+    // Function to fetch data from the API
+
+    function fetchData() {
+      $.ajax({
+        url: apiUrl,
+        method: 'GET',
+        dataType: 'json',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+        success: function(data) {
+          createImageGrid(data);
+        },
+        error: function(error) {
+          console.error('Error fetching data:', error);
+        }
+      });
+    }
+
+    // Call the function to fetch data from the API and create the grid
+    fetchData();
+  </script>
+</body>
+</html>
