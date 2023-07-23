@@ -1,1 +1,1 @@
-# -ajax-image-grid
+# Ajax-image-grid
